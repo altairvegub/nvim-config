@@ -235,6 +235,14 @@ require('lazy').setup {
       },
     },
   },
+  {
+    'NvChad/nvim-colorizer.lua',
+    opts = {
+      user_default_options = {
+        tailwind = true,
+      },
+    },
+  },
 
   -- NOTE: Plugins can also be configured to run lua code when they are loaded.
   --
@@ -515,6 +523,7 @@ require('lazy').setup {
       local servers = {
         clangd = {},
         gopls = {},
+        tailwindcss = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
