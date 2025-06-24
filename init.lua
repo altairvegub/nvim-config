@@ -165,7 +165,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-
+  'vuciv/golf',
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
@@ -532,7 +532,7 @@ require('lazy').setup {
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        -- tsserver = {},
         --
 
         lua_ls = {
@@ -647,12 +647,47 @@ require('lazy').setup {
       --    for various frameworks/libraries/etc. but you will have to
       --    set up the ones that are useful for you.
       -- 'rafamadriz/friendly-snippets',
+
+      { 'roobert/tailwindcss-colorizer-cmp.nvim', config = true },
     },
+
     config = function()
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
+
+      -- Define the opts function to modify formatting
+      local opts = function(_, opts)
+        -- Initialize the formatting field if it doesn't exist
+        opts.formatting = opts.formatting or {}
+        opts.formatting.format = opts.formatting.format or function(entry, item)
+          return item
+        end
+
+        -- Store the original format function
+        local format_kinds = opts.formatting.format
+
+        -- Override the format function
+        opts.formatting.format = function(entry, item)
+          -- Call the original format function to preserve its behavior
+          format_kinds(entry, item)
+
+          -- Apply the tailwindcss-colorizer-cmp formatter
+          return require('tailwindcss-colorizer-cmp').formatter(entry, item)
+        end
+      end
+
+      local cmp_opts = {
+        formatting = {
+          format = function(entry, item)
+            return item
+          end,
+        },
+      }
+
+      -- Call the opts function to modify the default options
+      opts(nil, cmp_opts)
 
       cmp.setup {
         snippet = {
@@ -701,6 +736,7 @@ require('lazy').setup {
             end
           end, { 'i', 's' }),
         },
+        formatting = cmp_opts.formatting,
         sources = {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
@@ -715,13 +751,13 @@ require('lazy').setup {
     -- change the command in the config to whatever the name of that colorscheme is
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
-    'folke/tokyonight.nvim',
+    'catppuccin/nvim',
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       vim.o.termguicolors = true
       -- Load the colorscheme here
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'catppuccin-macchiato'
 
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
